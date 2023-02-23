@@ -1,5 +1,6 @@
 // Commands
 // forge test --match-path test/Metarix_Staking.t.sol -vvvvv --gas-report
+// forge test --match-path test/Metarix_Staking.t.sol --gas-report
 
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
@@ -48,12 +49,25 @@ contract MetarixStaking_Test is Test {
 
     function testStaking() public {
         vm.prank(user);
-
         token.approve(address(staking), 100 * 10 ** 18);
 
         // uint256 _allowance = token.allowance(user, address(staking));
         // console.log("Allowance: %s", _allowance);
 
         staking.stake(2, 10 * 10 ** 18);
+    }
+
+    function testFailUnstake() public {
+        vm.prank(user);
+        token.approve(address(staking), 100 * 10 ** 18);
+        staking.stake(2, 10 * 10 ** 18);
+        staking.unstake(0); 
+    }
+
+    function testEmergencyWithdraw() public {
+        vm.prank(user);
+        token.approve(address(staking), 100 * 10 ** 18);
+        staking.stake(2, 10 * 10 ** 18);
+        staking.emergencyWithdraw(0);
     }
 }
