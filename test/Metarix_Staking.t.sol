@@ -70,4 +70,54 @@ contract MetarixStaking_Test is Test {
         staking.stake(2, 10 * 10 ** 18);
         staking.emergencyWithdraw(0);
     }
+
+    function testCompund() public {
+        vm.prank(user);
+        token.approve(address(staking), 100 * 10 ** 18);
+        staking.stake(2, 10 * 10 ** 18);
+        vm.warp(block.timestamp + 7 days);
+        staking.compound(0);
+    }
+
+    function testFailCompundAfterMaturity() public {
+        vm.prank(user);
+        token.approve(address(staking), 100 * 10 ** 18);
+        staking.stake(0, 10 * 10 ** 18);
+        vm.warp(block.timestamp + 91 days);
+        staking.compound(0); 
+    }
+
+    function testCompundAndUnstake() public {
+        vm.prank(user);
+        token.approve(address(staking), 100 * 10 ** 18);
+        staking.stake(0, 10 * 10 ** 18);
+        vm.warp(block.timestamp + 7 days);
+        staking.compound(0);
+        vm.warp(block.timestamp + 91 days);
+        staking.unstake(0); 
+    }
+
+    function testDoubleCompundAndUnstake() public {
+        vm.prank(user);
+        token.approve(address(staking), 100 * 10 ** 18);
+        staking.stake(0, 10 * 10 ** 18);
+        vm.warp(block.timestamp + 7 days);
+        staking.compound(0);
+        vm.warp(block.timestamp + 30 days);
+        staking.compound(0);
+        vm.warp(block.timestamp + 91 days);
+        staking.unstake(0); 
+    }
+
+    function testFailDoubleCompundAndUnstake() public {
+        vm.prank(user);
+        token.approve(address(staking), 100 * 10 ** 18);
+        staking.stake(0, 10 * 10 ** 18);
+        vm.warp(block.timestamp + 7 days);
+        staking.compound(0);
+        vm.warp(block.timestamp + 84 days);
+        staking.compound(0);
+        vm.warp(block.timestamp + 90 days);
+        staking.unstake(0); 
+    }
 }
